@@ -1,1 +1,77 @@
+#1
+SELECT DISTINCT City, State, Zip
+FROM Customer;
 
+#2
+SELECT EmpName, Department, Phone, Email
+FROM Employee
+WHERE Phone LIKE "3-%";
+
+#3
+SELECT *
+FROM ResourceTbl
+WHERE Rate >=10 AND Rate <=20
+ORDER BY Rate;
+
+#4
+SELECT *
+FROM EventRequest
+WHERE Estatus IN ("Approved","Pending") 
+	AND (DateAuth >= "2018-07-01" and DateAuth <= "2018-07-31");
+
+#5
+SELECT L.LocNo, L.LocName
+FROM Location as L 
+INNER JOIN Facility as F
+	ON L.FacNo = F.FacNo
+WHERE F.FacName = "Basketball arena";
+
+#6
+SELECT epl.PlanNo,COUNT(*),SUM(ep)
+FROM EventPlanLine as epl
+INNER JOIN EventPlan as ep
+	ON epl.PlanNo = ep.PlanNo
+WHERE COUNT(ep.PlanNo) > 1;
+
+#7
+SELECT PlanNo, LineNo, TIMEDIFF(TimeEnd,TimeStart)
+FROM EventPlanLine;
+
+#8
+SELECT epl.PlanNo
+		, COUNT(DISTINCT epl.LineNo)
+        , TIMEDIFF(epl.TimeEnd,epl.TimeStart) as AmountOfTime
+        , TIMESTAMPDIFF(MINUTE,epl.TimeEnd,epl.TimeStart)
+        ,SUM(TIMEDIFF(epl.TimeEnd,epl.TimeStart)*R.Rate)
+FROM EventPlanLine as epl
+INNER JOIN ResourceTbl as R
+    ON epl.ResNo = R.ResNo
+GROUP BY epl.PlanNo;
+
+#9
+SELECT ep.EventNo
+		, epl.PlanNo
+		, COUNT(DISTINCT epl.LineNo) as CountOfLines
+        , Round(SUM(TIMESTAMPDIFF(MINUTE,epl.TimeStart,epl.TimeEnd))/60,2) as TotalTime
+        , SUM(epl.NumberFld) as TotalResourcesAssigned
+        , ROUND(SUM(TIMESTAMPDIFF(MINUTE,epl.TimeStart,epl.TimeEnd)/60 * R.Rate * epl.NumberFld),2) as TotalResourceCost
+FROM EventPlan as ep INNER JOIN EventPlanLine as epl
+	ON ep.PlanNo = epl.PlanNo
+    INNER JOIN ResourceTbl as R
+    ON epl.ResNo = R.ResNo
+GROUP BY epl.PlanNo
+HAVING COUNT(epl.LineNo) > 1
+ORDER BY ep.EventNo;
+
+#10
+SELECT * 
+FROM EventRequest
+WHERE EStatus IN ("Approved","Pending") AND (DateAuth >= "2018-07-01" AND DateAuth <= "2018-07-31");
+
+#11
+SELECT L.LocNo
+		,L.LocName
+FROM Location as L
+INNER JOIN Facility as F
+	ON F.FacNo = L.FacNo
+Where F.FacName = "Basketball Arena";
