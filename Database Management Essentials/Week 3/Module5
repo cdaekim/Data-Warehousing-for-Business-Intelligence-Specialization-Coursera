@@ -1,1 +1,76 @@
+#1
+SELECT ep.EventNo, er.DateHeld, COUNT(*) as NumberofEvents
+FROM EventRequest as er 
+INNER JOIN EventPlan as ep
+	ON er.EventNo = ep.EventNo
+WHERE MONTH(er.DateHeld)=12
+GROUP BY EventNo
+HAVING COUNT(*)>1;
 
+#2
+SELECT ep.PlanNo, ep.EventNo, ep.WorkDate, ep.Activity
+FROM EventPlan as ep
+INNER JOIN EventRequest as er
+	ON ep.EventNo = er.EventNo
+    INNER JOIN Facility as f
+		ON er.FacNo = f.FacNo
+WHERE f.FacName = "Basketball arena";
+
+#3
+SELECT er.EventNo, er.DateHeld, er.EStatus, er.EstCost
+FROM EventRequest as er
+INNER JOIN EventPlan as ep
+	ON er.EventNo = ep.EventNo
+	INNER JOIN Facility as f
+		ON er.FacNo = f.FacNo
+        INNER JOIN Employee as e
+			ON ep.EmpNo = e.EmpNo
+WHERE DateHeld BETWEEN CAST("2018-10-01" AS DATE) AND CAST("2018-12-31" AS DATE) 
+	AND f.FacName="Basketball arena" 
+    AND e.EmpName = "Mary Manager";
+
+#4
+SELECT epl.PlanNo
+		, epl.LineNo
+        , r.ResName
+        , epl.NumberFld
+        , l.LocName
+        , epl.TimeStart
+        , epl.TimeEnd
+FROM EventPlanLine as epl
+INNER JOIN ResourceTbl as r
+	ON epl.ResNo = r.ResNo
+    INNER JOIN Location as l
+		ON epl.LocNo = l.LocNo
+		INNER JOIN EventPlan as ep
+			ON ep.PlanNo = epl.PlanNo
+            INNER JOIN Facility as f
+				ON f.FacNo = l.FacNo
+WHERE ep.WorkDate BETWEEN CAST("2018-10-01" AS DATE) AND CAST("2018-12-31" AS DATE)
+	AND ep.Activity = "Operation"
+    AND f.FacName = "Basketball Arena";
+
+#5
+Insert into Facility (FacNo,FacName) values ('F104','Swimming Pool');
+
+#6
+UPDATE Facility
+SET FacNo = 'F104'
+WHERE FacName = 'Swimming Pool';
+
+#7
+INSERT INTO Location (LocNo, FacNo, LocName) VALUES ('L107','F104', 'Entrance');
+
+#8
+INSERT INTO Location (LocNo, FacNo, LocName) VALUES ('L108','F104','Locker Room');
+
+#9
+UPDATE Location
+SET LocName = 'Gate'
+WHERE LocNo = 'L107' AND FacNo = 'F104';
+SELECT * FROM LOCATION;
+
+#10
+DELETE FROM Location 
+WHERE LocNo='L108';
+SELECT * FROM LOCATION;
